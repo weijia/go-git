@@ -184,5 +184,11 @@ func (m FileMode) ToOSFileMode() (os.FileMode, error) {
 		return os.ModePerm | os.ModeSymlink, nil
 	}
 
+	// Handle non-standard git modes (e.g. 0100600 from Gitee)
+	// Treat them as regular files with 0644 permissions
+	if m.IsFile() {
+		return os.FileMode(0644), nil
+	}
+
 	return os.FileMode(0), fmt.Errorf("malformed mode (%s)", m)
 }
