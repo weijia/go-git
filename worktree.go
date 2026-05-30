@@ -602,7 +602,7 @@ func (w *Worktree) checkoutChangeSubmodule(name string,
 	case merkletrie.Insert:
 		mode, err := e.Mode.ToOSFileMode()
 		if err != nil {
-			return err
+			return fmt.Errorf("checkout insert(%q) failed: mode=%s, error=%w", name, e.Mode, err)
 		}
 
 		if err := w.Filesystem.MkdirAll(name, mode); err != nil {
@@ -651,7 +651,8 @@ func (w *Worktree) checkoutChangeRegularFile(name string,
 func (w *Worktree) checkoutFile(f *object.File) (err error) {
 	mode, err := f.Mode.ToOSFileMode()
 	if err != nil {
-		return
+		// Add debug info: print file name and mode when ToOSFileMode fails
+		return fmt.Errorf("checkoutFile(%q) failed: mode=%s, error=%w", f.Name, f.Mode, err)
 	}
 
 	if mode&os.ModeSymlink != 0 {
