@@ -185,8 +185,9 @@ func (m FileMode) ToOSFileMode() (os.FileMode, error) {
 	}
 
 	// Handle non-standard git modes (e.g. 0100600 from Gitee)
-	// Treat them as regular files with 0644 permissions
-	if m.IsFile() {
+	// Git file modes start with 0100000 (regular), 0110000 (symlink), etc.
+	// If the mode looks like a file (not dir/submodule), treat as regular file
+	if m&0170000 != 0 && m != Dir && m != Submodule {
 		return os.FileMode(0644), nil
 	}
 
