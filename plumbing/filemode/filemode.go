@@ -168,21 +168,27 @@ func (m FileMode) IsFile() bool {
 //
 // The returned file mode does not take into account the umask.
 func (m FileMode) ToOSFileMode() (os.FileMode, error) {
-	switch m {
-	case Dir:
-		return os.ModePerm | os.ModeDir, nil
-	case Submodule:
-		return os.ModePerm | os.ModeDir, nil
-	case Regular:
-		return os.FileMode(0644), nil
-	// Deprecated is no longer allowed: treated as a Regular instead
-	case Deprecated:
-		return os.FileMode(0644), nil
-	case Executable:
-		return os.FileMode(0755), nil
-	case Symlink:
-		return os.ModePerm | os.ModeSymlink, nil
-	}
+        switch m {
+        case Dir:
+                return os.ModePerm | os.ModeDir, nil
+        case Submodule:
+                return os.ModePerm | os.ModeDir, nil
+        case Regular:
+                return os.FileMode(0644), nil
+        // Deprecated is no longer allowed: treated as a Regular instead
+        case Deprecated:
+                return os.FileMode(0644), nil
+        case Executable:
+                return os.FileMode(0755), nil
+        case Symlink:
+                return os.ModePerm | os.ModeSymlink, nil
+        }
 
-	return os.FileMode(0), fmt.Errorf("malformed mode (%s)", m)
+        // Handle non-standard file modes (e.g., 0100600 from Gitee)
+        // Any mode with file type 100000 (regular file) should be treated as regular
+        if m&0o170000 == 0o100000 {
+                return os.FileMode(0644), nil
+        }
+
+        return os.FileMode(0), fmt.Errorf("malformed mode (%s)", m)
 }
