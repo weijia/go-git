@@ -243,7 +243,7 @@ func (h *buildTreeHelper) doBuildTree(e *index.Entry, parent, fullpath string) {
 	te := object.TreeEntry{Name: path.Base(fullpath)}
 
 	if fullpath == e.Name {
-		te.Mode = e.Mode
+		te.Mode = object.CanonicalTreeMode(e.Mode)
 		te.Hash = e.Hash
 	} else {
 		te.Mode = filemode.Dir
