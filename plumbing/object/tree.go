@@ -317,7 +317,7 @@ func (t *Tree) Decode(o plumbing.EncodedObject) (err error) {
 		if err != nil {
 			return fmt.Errorf("%w: malformed mode", ErrMalformedTree)
 		}
-		mode = canonicalTreeMode(mode)
+		mode = CanonicalTreeMode(mode)
 
 		name, err := r.ReadString(0)
 		if err != nil {
@@ -379,7 +379,7 @@ func treeEntrySortName(e *TreeEntry) string {
 	return e.Name
 }
 
-func canonicalTreeMode(mode filemode.FileMode) filemode.FileMode {
+func CanonicalTreeMode(mode filemode.FileMode) filemode.FileMode {
 	switch mode & 0o170000 {
 	case 0o040000:
 		return filemode.Dir
